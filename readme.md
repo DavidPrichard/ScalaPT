@@ -5,38 +5,28 @@ Global Illumination in several hundred lines of Scala.
 
 # Introduction
 
-![Screenshot](https://github.com/jon-hanson/ScalaPT/blob/master/examples/cornell2.png)
+This is my fork of Jon Hanson's project ScalaPT, which is, in turn, a Scala implementation of Kevin Beason's [smallpt](http://www.kevinbeason.com/smallpt/), a simple path-tracing global illumination renderer written in C++.
 
-ScalaPT is a rewrite in Scala of Kevin Beason's [smallpt](http://www.kevinbeason.com/smallpt/) global illumination renderer.
+Here's how he describes ScalaPT:
 
-Smallpt (and therefore ScalaPT) solves the [Rendering Equation](https://en.wikipedia.org/wiki/Rendering_equation)
-using a [Monte Carlo](https://en.wikipedia.org/wiki/Monte_Carlo_method) approach,
-whereby multiple light paths are fired per pixel and averaged over.
-Each path is traced backwards through the scene as it bounces off various surfaces.
-The incoming ray for each bounce is chosen at random,
-governed by the [bidirectional distribution functions](https://en.wikipedia.org/wiki/Bidirectional_scattering_distribution_function)
-for the material of the surface in question.
+>Smallpt (and therefore ScalaPT) solves the [Rendering Equation](https://en.wikipedia.org/wiki/Rendering_equation)
+>using a [Monte Carlo](https://en.wikipedia.org/wiki/Monte_Carlo_method) approach,
+>whereby multiple light paths are fired per pixel and averaged over.
+>Each path is traced backwards through the scene as it bounces off various surfaces.
+>The incoming ray for each bounce is chosen at random,
+>governed by the [bidirectional distribution >functions](https://en.wikipedia.org/wiki/Bidirectional_scattering_distribution_function)
+>for the material of the surface in question.
 
-This approach, while slow to converge,
-is a relatively simple means of obtaining photorealistic images,
-which include natural effects such as ambient occlusion, light bleeding,
-reflections, refraction and caustics.
+>This approach, while slow to converge,
+>is a relatively simple means of obtaining photorealistic images,
+>which include natural effects such as ambient occlusion, light bleeding,
+>reflections, refraction and caustics.
 
-The code was rewritten with several goals in mind:
+>While the application is running it displays a window containing the image as it renders:
 
-* Port to Scala. The Scala code has been rewritten to be more idiomatic and avoid mutable data where possible.
-* Make the underlying implementation more readily understandable (the original code was designed to be as short as possible).
-* Render each frame (i.e. each iteration) of the image progressively (the original rendered each pixel completely before moving onto the next).
+><img src="https://github.com/jon-hanson/ScalaPT/blob/master/examples/screenshot.png" width="257"/>
 
-Consequently, the source code lacks the brevity of the original - excluding the windowing and I/O code it's around 800 lines in total, so about 8 times longer.
-
-While the application is running it displays a window containing the image as it renders:
-
-<img src="https://github.com/jon-hanson/ScalaPT/blob/master/examples/screenshot.png" width="257"/>
-
-Note, I haven't, at this stage, added any optimizations, so the rendered image is relatively slow to converge.
-As per the original smallpt, to arrive at a completely noise-free image can require around 25k iterations,
-which, for the default image size, can take several hours on a modern PC.
+Among other things, I hope to make it converge a little faster.
 
 # Usage
 
@@ -68,7 +58,15 @@ ScalaPT differs from the original in several places:
 * Scene definitions can be read from a JSON file.
 * Random number generation replaced with a State monad (which wraps an XorShift random number generator).
 
+# To-do:
+
+* Speed up convergence by sampling with a [low-discrepancy sequence](https://en.wikipedia.org/wiki/Low-discrepancy_sequence).
+* Consider any micro-optimizations worth their weight.
+* 
+
 # Examples
+
+Hopefully I'll have some slick pictures here soon! For now, look at this ol' thing from the original:
 
 ## "Horizon"
 
