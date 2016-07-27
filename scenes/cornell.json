@@ -25,12 +25,12 @@
                     "green" : 0.25,
                     "blue" : 0.25
                 },
-                "emColour" : {
+                "emission" : {
                     "red" : 0.0,
                     "green" : 0.0,
                     "blue" : 0.0
                 },
-                "emis" : false
+                "emissive" : false
             },
             "side" : "X",
             "posFacing" : true,
@@ -46,12 +46,12 @@
                     "green" : 0.25,
                     "blue" : 0.75
                 },
-                "emColour" : {
+                "emission" : {
                     "red" : 0.0,
                     "green" : 0.0,
                     "blue" : 0.0
                 },
-                "emis" : false
+                "emissive" : false
             },
             "side" : "X",
             "posFacing" : false,
@@ -67,12 +67,12 @@
                     "green" : 0.75,
                     "blue" : 0.75
                 },
-                "emColour" : {
+                "emission" : {
                     "red" : 0.0,
                     "green" : 0.0,
                     "blue" : 0.0
                 },
-                "emis" : false
+                "emissive" : false
             },
             "side" : "Z",
             "posFacing" : true,
@@ -88,12 +88,12 @@
                     "green" : 0.0,
                     "blue" : 0.0
                 },
-                "emColour" : {
+                "emission" : {
                     "red" : 0.0,
                     "green" : 0.0,
                     "blue" : 0.0
                 },
-                "emis" : false
+                "emissive" : false
             },
             "side" : "Z",
             "posFacing" : false,
@@ -109,12 +109,12 @@
                     "green" : 0.75,
                     "blue" : 0.75
                 },
-                "emColour" : {
+                "emission" : {
                     "red" : 0.0,
                     "green" : 0.0,
                     "blue" : 0.0
                 },
-                "emis" : false
+                "emissive" : false
             },
             "side" : "Y",
             "posFacing" : true,
@@ -130,12 +130,12 @@
                     "green" : 0.75,
                     "blue" : 0.75
                 },
-                "emColour" : {
+                "emission" : {
                     "red" : 0.0,
                     "green" : 0.0,
                     "blue" : 0.0
                 },
-                "emis" : false
+                "emissive" : false
             },
             "side" : "Y",
             "posFacing" : false,
@@ -151,7 +151,7 @@
                     "green" : 0.999,
                     "blue" : 0.999
                 },
-                "emColour" : {
+                "emission" : {
                     "red" : 0.0,
                     "green" : 0.0,
                     "blue" : 0.0
@@ -174,7 +174,7 @@
                     "green" : 0.999,
                     "blue" : 0.999
                 },
-                "emColour" : {
+                "emission" : {
                     "red" : 0.0,
                     "green" : 0.0,
                     "blue" : 0.0
@@ -197,12 +197,12 @@
                     "green" : 0.0,
                     "blue" : 0.0
                 },
-                "emColour" : {
+                "emission" : {
                     "red" : 12.0,
                     "green" : 12.0,
                     "blue" : 12.0
                 },
-                "emis" : true
+                "emissive" : true
             },
             "centre" : {
                 "x" : 50.0,

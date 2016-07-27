@@ -4,128 +4,84 @@ import java.awt._
 import java.awt.event.{MouseAdapter, MouseEvent, WindowAdapter, WindowEvent}
 import java.awt.image.BufferedImage
 import java.io.File
-import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
+import java.time.{LocalDateTime => DateTime}
 import javax.imageio.ImageIO
-
 
 
 object MainFrame {
   def main(args: Array[String]): Unit = {
-    val inFile  = if (args.length > 0) args(0) else "scenes/cornell2.json"
-    val width   = if (args.length > 1) Integer.parseInt(args(1)) else 1024
-    val height  = if (args.length > 2) Integer.parseInt(args(2)) else 768
-    val frames  = if (args.length > 3) Integer.parseInt(args(3)) else 1024
-    val outFile = if (args.length > 4) Option(new File(args(4))) else Option.empty
 
-    val frame = new MainFrame("ScalaPT", width, height, inFile, frames, outFile)
+    val inFile     = if (args.length > 0) args(0) else "scenes/horizon2.json"
+    val width      = if (args.length > 1) Integer.parseInt(args(1)) else 1024
+    val height     = if (args.length > 2) Integer.parseInt(args(2)) else 768
+    val iterations = if (args.length > 3) Integer.parseInt(args(3)) else 1024
+    val outFile    = if (args.length > 4) Option(new File(args(4))) else None
+
+    new MainFrame("ScalaPT", width, height, iterations, inFile, outFile)
   }
 }
 
 class MainFrame(
-   frameTitle: String,
+   title: String,
    val w: Int,
    val h: Int,
+   val iterations: Int,
    val inFile: String,
-   val frames: Int,
-   val outFile: Option[File],
-   var closing: Boolean = false
-) extends Frame(frameTitle) {
+   val outFile: Option[File]
+               ) extends Frame(title) {
 
-  println("Scene: " + inFile)
-  println("Width: " + w)
-  println("Height: " + h)
-  println("Frames: " + frames)
+  println(s"Scene: $inFile Width: $w Height: $h Iterations: $iterations")
   outFile.foreach(name => println("Outfile: " + name))
 
+
   val scene = SceneIO.load(inFile)
-
-  pack()
-
   val ins = getInsets
-  val dim = new Dimension(w + ins.left + ins.right, h + ins.top + ins.bottom)
-  setSize(dim)
-  setResizable(false)
-  addWindowListener(new WindowAdapter() {
-    override def windowClosing(we: WindowEvent) = {
-      closing = true
-      dispose()
-    }
-  })
 
-  addMouseListener(new MouseAdapter() {
-    override def mouseClicked(me: MouseEvent) = {
-      val sx = me.getX
-      val sy = me.getY
-      val x = sx - ins.left + 1
-      val y = h - (sy - ins.top) - 3
-
-      System.out.print(x + ": " + y + " -> ")
-
-      val ss = rdr.render(x, y).runA(Random.randDouble(x+y*rdr.width)).value
-      System.out.println(ss)
-    }
-  })
-
-  setLocationRelativeTo(null)
-  setBackground(Color.BLACK)
-  setVisible(true)
-
-  val rdr = new MonteCarloRenderer(w, h, scene)
-
+  val rt         = new RayTracer(w, h, scene)
   val renderData = new Array[Array[SuperSamp]](h)
-
-  val image = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB)
+  val image      = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB)
 
   val gr2d = image.getGraphics
-  gr2d.setColor(Color.RED)
-  gr2d.drawRect(0, 0, w-1, h-1)
-  repaint(ins.left, ins.top, w, h)
+      gr2d.setColor(Color.RED)
+      gr2d.drawRect(0, 0, w-1, h-1)
 
-  for (i <- 0 until frames) {
+  var closing = false
+
+  setupWindow()
+  setupHandlers()
+
+  val began = DateTime.now()
+
+  for (i <- 0 until iterations) {
     if (!closing) {
       render(i)
+      printStatus(i+1)
     }
   }
 
-  System.out.println(LocalDateTime.now() + ": Done")
+  saveImage(outFile)
 
-  outFile.foreach(file => {
-    val name = file.getName
-    val dotPos = name.lastIndexOf('.')
-    val format =
-      if (dotPos != -1) {
-        name.substring(dotPos + 1)
-      }
-      else
-        "png"
 
-    println("Saving to file '" + name + "' as format " + format)
-    if (!ImageIO.write(image, format, file)) {
-      println("ERROR: filename prefix '" + format + " not recognised as a format")
-    }
-  })
+  def render(iteration: Int) = {
 
-  def render(i: Int) = {
-    println(LocalDateTime.now() + ": Frame " + i)
-
-    ConcurrentUtils.parallelFor (0 until rdr.height) { y =>
-      val row = new Array[SuperSamp](rdr.width)
-      for (x <- 0 until rdr.width) {
-        val seed = (x+y*rdr.width)*(i+1)
-        row(x) = rdr.render(x, y).runA(Random.randDouble(seed)).value
+    Concurrent.For(0 until rt.height) { y =>
+      val row = new Array[SuperSamp](rt.width)
+      for (x <- 0 until rt.width) {
+        val seed = (x+y*rt.width)*(iteration+1)
+        row(x) = rt.render(x, y).runA(Random.randDouble(seed)).value
       }
 
-      if (i == 0)
+      if (iteration == 0)
         renderData(y) = row
       else
-        merge(renderData(y), row, i)
+        merge(renderData(y), row, iteration)
 
       val mergedRow = renderData(y)
 
       val sy = h - y - 1
-      for (sx <- 0 until w) {
-        image.setRGB(sx, sy, colVecToInt(mergedRow(sx).clamp))
-      }
+
+      for (sx <- 0 until w) image.setRGB(sx, sy, mergedRow(sx).clamp.outputColour())
 
       repaint(ins.left, ins.top + sy, w, 1)
     }
@@ -136,19 +92,69 @@ class MainFrame(
       l(i) = l(i).merge(r(i), n)
   }
 
-  private def colVecToInt(color: RGB): Int =
-    toIntColor(color.blue) | (toIntColor(color.green) << 8) | (toIntColor(color.red) << 16)
-
-
-  private def toIntColor(d: Double): Int = {
-    val i = MathUtil.gammaCorrection(d)
-    val j = i * 255.0 + 0.5
-    MathUtil.clamp(j, 0, 255).toInt
-  }
-
   override def paint(graphics: Graphics) = {
     val g2d = graphics.asInstanceOf[Graphics2D]
     g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF)
     g2d.drawImage(image, ins.left, ins.top, null)
+  }
+
+  private def printStatus(iteration: Int): Unit = {
+
+    val mean = ChronoUnit.SECONDS.between(began, DateTime.now()) / iteration
+    println(s"Iteration: $iteration, Time per iteration: $mean seconds, Samples per pixel: ")
+  }
+
+  private def saveImage(outFile: Option[File]): Unit = {
+
+    outFile match {
+      case None => ()
+      case Some(file) =>
+
+        val name = file.getName
+
+        var format = "png"
+
+        if (name.contains('.'))
+          format = name.substring(name.lastIndexOf('.') + 1)
+
+        if (ImageIO.write(image, format, file))
+          println(s"Saving to file $name")
+        else
+          println(s"ERROR: filename suffix $format not recognised.")
+    }
+  }
+
+  private def setupWindow(): Unit = {
+
+    // pack() // match window size to its contents
+
+    setSize(new Dimension(w + ins.left + ins.right, h + ins.top + ins.bottom))
+    setResizable(false)
+    setLocationRelativeTo(null)
+    setBackground(Color.BLACK)
+    setVisible(true)
+  }
+
+  private def setupHandlers(): Unit = {
+
+    addWindowListener(new WindowAdapter() {
+      override def windowClosing(we: WindowEvent) = {
+        closing = true
+        dispose()
+      }
+    })
+
+    addMouseListener(new MouseAdapter() {
+      override def mouseClicked(me: MouseEvent) = {
+        val x = me.getX - ins.left + 1
+        val y = h - (me.getY - ins.top) - 3
+
+        System.out.print(x + ": " + y + " -> ")
+
+        val ss = rt.render(x, y).runA(Random.randDouble(x+y*rt.width)).value
+        System.out.println(ss)
+      }
+    })
+
   }
 }

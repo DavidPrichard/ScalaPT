@@ -1,5 +1,27 @@
 package scalapt
 
+import Shape._
+/**
+  * Shape
+  */
+object Shape {
+  /**
+    * Epsilon value to avoid object self-intersection.
+    */
+  final val ε = 1e-4
+}
+
+trait Shape {
+
+  val name: String // For debugging.
+
+  val material: Material
+
+  def intersect(ray: Ray): Option[Double]
+
+  def normal(p: Point3): Vector3
+}
+
 /**
   * Sphere
   */
@@ -10,15 +32,15 @@ case class Sphere(
   radius: Double
                  ) extends Shape {
 
-  override def intersect(ray: Ray, eps: Double): Option[Double] = {
+  override def intersect(ray: Ray): Option[Double] = {
     val e = ray.origin - centre
     val f = ray.dir dot e
-    val g = f*f - (e dot e) + radius*radius
+    val dsquared = f*f - (e dot e) + radius*radius
 
-    if (g > 0.0) {
-      val determinant = math.sqrt(g)
+    if (dsquared > 0.0) {
+      val determinant = math.sqrt(dsquared)
       val t = -f - determinant
-      if (t > eps)
+      if (t > ε)
         Some(t)
       else
         None
@@ -28,7 +50,7 @@ case class Sphere(
 
   }
 
-  override def normal(p: Point3) = (p - centre).normalise
+  def normal(p: Point3) = (p - centre).normalise
 
 }
 
@@ -44,11 +66,10 @@ case class Plane(
     v: Double
 ) extends Shape {
 
-  override def intersect(ray: Ray, eps: Double): Option[Double] = {
-    if ((math.abs(ray.dir(side)) > Double.MinPositiveValue) &&
-      ((ray.origin(side) > v) == posFacing)) {
+  def intersect(ray: Ray): Option[Double] = {
+    if ((math.abs(ray.dir(side)) > Double.MinPositiveValue) && ((ray.origin(side) > v) == posFacing)) {
       val t = (v - ray.origin(side)) / ray.dir(side)
-      if (t > eps)
+      if (t > ε)
         Some(t)
       else
         None
@@ -57,7 +78,7 @@ case class Plane(
       None
   }
 
-  override def normal(p: Point3) =
+  def normal(p: Point3) =
     side match {
       case Axis.X => Vector3.XUnit
       case Axis.Y => Vector3.YUnit

@@ -9,40 +9,28 @@ object Axis extends Enumeration {
 }
 
 /**
+  * Ray; has to be a case class for automatic Circe json serialization,
+  * but needs its dir parameter normalized wherever the constructor is called.
+  * TODO FIX IT
+  */
+case class Ray(origin: Point3, dir: Vector3) {
+
+  def travels(length: Double): Point3 = origin + dir * length
+}
+
+/**
   * Point3
   */
 object Point3 {
-  final val Zero  = Point3(0.0, 0.0, 0.0)
-
-  final val XUnit = Point3(1.0, 0.0, 0.0)
-  final val YUnit = Point3(0.0, 1.0, 0.0)
-  final val ZUnit = Point3(0.0, 0.0, 1.0)
-
-  val NegInf = new Point3(Double.NegativeInfinity, Double.NegativeInfinity, Double.NegativeInfinity)
-  val PosInf = new Point3(Double.PositiveInfinity, Double.PositiveInfinity, Double.PositiveInfinity)
 }
 
 case class Point3(x: Double, y: Double, z: Double) {
-
-  def apply(i: Int): Double = i match {
-    case 0 => x
-    case 1 => y
-    case 2 => z
-  }
 
   def apply(ax: Axis.Type): Double = ax match {
     case Axis.X => x
     case Axis.Y => y
     case Axis.Z => z
   }
-
-  def withX(x: Double) = Point3(x, y, z)
-
-  def withY(y: Double) = Point3(x, y, z)
-
-  def withZ(z: Double) = Point3(x, y, z)
-
-  def unary_+ = this
 
   def unary_- = Vector3(-x, -y, -z)
 
@@ -69,7 +57,8 @@ case class Point3(x: Double, y: Double, z: Double) {
   * Vector3
   */
 object Vector3 {
-  final val Zero = Vector3(0.0, 0.0, 0.0)
+  final val Zero  = Vector3(0.0, 0.0, 0.0)
+
   final val XUnit = Vector3(1.0, 0.0, 0.0)
   final val YUnit = Vector3(0.0, 1.0, 0.0)
   final val ZUnit = Vector3(0.0, 0.0, 1.0)
@@ -83,25 +72,11 @@ object Vector3 {
 
 case class Vector3(x: Double, y: Double, z: Double) {
 
-  def apply(i: Int): Double = i match {
-    case 0 => x
-    case 1 => y
-    case 2 => z
-  }
-
   def apply(ax: Axis.Type): Double = ax match {
     case Axis.X => x
     case Axis.Y => y
     case Axis.Z => z
   }
-
-  def withX(nx: Double) = Vector3(nx, y, z)
-
-  def withY(ny: Double) = Vector3(x, ny, z)
-
-  def withZ(nz: Double) = Vector3(x, y, nz)
-
-  def unary_+ = this
 
   def unary_- = Vector3(-x, -y, -z)
 
@@ -122,11 +97,12 @@ case class Vector3(x: Double, y: Double, z: Double) {
             x * that.y - y * that.x
         )
 
-  def length = math.sqrt(lengthSquared)
+  def length: Double = math.sqrt(lengthSquared)
 
-  def lengthSquared = x*x + y*y + z*z
+  def lengthSquared: Double = x*x + y*y + z*z
 
-  def normalise = this * (1.0 / length)
+  def normalise: Vector3 = this * (1.0 / length)
 
-  def hasNaNs = x.isNaN || y.isNaN || z.isNaN
+  def hasNaNs: Boolean = x.isNaN || y.isNaN || z.isNaN
 }
+

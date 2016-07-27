@@ -25,7 +25,7 @@
                     "green" : 0.25,
                     "blue" : 0.25
                 },
-                "emColour" : {
+                "emission" : {
                     "red" : 0.0,
                     "green" : 0.0,
                     "blue" : 0.0
@@ -46,7 +46,7 @@
                     "green" : 0.25,
                     "blue" : 0.75
                 },
-                "emColour" : {
+                "emission" : {
                     "red" : 0.0,
                     "green" : 0.0,
                     "blue" : 0.0
@@ -67,7 +67,7 @@
                     "green" : 0.75,
                     "blue" : 0.75
                 },
-                "emColour" : {
+                "emission" : {
                     "red" : 0.0,
                     "green" : 0.0,
                     "blue" : 0.0
@@ -88,7 +88,7 @@
                     "green" : 0.0,
                     "blue" : 0.0
                 },
-                "emColour" : {
+                "emission" : {
                     "red" : 0.0,
                     "green" : 0.0,
                     "blue" : 0.0
@@ -109,7 +109,7 @@
                     "green" : 0.75,
                     "blue" : 0.75
                 },
-                "emColour" : {
+                "emission" : {
                     "red" : 0.0,
                     "green" : 0.0,
                     "blue" : 0.0
@@ -130,7 +130,7 @@
                     "green" : 0.75,
                     "blue" : 0.75
                 },
-                "emColour" : {
+                "emission" : {
                     "red" : 0.0,
                     "green" : 0.0,
                     "blue" : 0.0
@@ -151,7 +151,7 @@
                     "green" : 0.999,
                     "blue" : 0.999
                 },
-                "emColour" : {
+                "emission" : {
                     "red" : 0.0,
                     "green" : 0.0,
                     "blue" : 0.0
@@ -174,7 +174,7 @@
                     "green" : 0.999,
                     "blue" : 0.999
                 },
-                "emColour" : {
+                "emission" : {
                     "red" : 0.0,
                     "green" : 0.0,
                     "blue" : 0.0
@@ -197,7 +197,7 @@
                     "green" : 0.75,
                     "blue" : 0.25
                 },
-                "emColour" : {
+                "emission" : {
                     "red" : 0.0,
                     "green" : 0.0,
                     "blue" : 0.0
@@ -221,7 +221,7 @@
                     "green" : 0.0,
                     "blue" : 0.0
                 },
-                "emColour" : {
+                "emission" : {
                     "red" : 12.0,
                     "green" : 12.0,
                     "blue" : 12.0
