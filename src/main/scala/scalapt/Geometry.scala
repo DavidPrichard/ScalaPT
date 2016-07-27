@@ -88,9 +88,9 @@ case class Vector3(x: Double, y: Double, z: Double) {
 
   def /(s: Double): Vector3 = Vector3(x / s, y / s, z / s)
 
-  def dot(that: Vector3): Double = x * that.x + y * that.y + z * that.z
+  def ∙(that: Vector3): Double = x * that.x + y * that.y + z * that.z
 
-  def cross(that: Vector3): Vector3 =
+  def ×(that: Vector3): Vector3 =
         Vector3(
             y * that.z - z * that.y,
             z * that.x - x * that.z,
@@ -98,6 +98,7 @@ case class Vector3(x: Double, y: Double, z: Double) {
         )
 
   def length: Double = math.sqrt(lengthSquared)
+
 
   def lengthSquared: Double = x*x + y*y + z*z
 

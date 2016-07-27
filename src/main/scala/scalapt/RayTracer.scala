@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit
 
 import cats.data.State
 
+import scala.annotation.tailrec
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
@@ -31,7 +32,7 @@ object Concurrent {
 class RayTracer(val width: Int, val height: Int, val scene: Scene) {
 
   private val cx = Vector3(width * scene.camera.fov / height, 0.0, 0.0)
-  private val cy = cx.cross(scene.camera.ray.dir).normalise * scene.camera.fov
+  private val cy = cx × scene.camera.ray.dir.normalise * scene.camera.fov
 
   def camRay(x: Double, y: Double): Vector3 =
     cx * (x / width - 0.5) + cy * (y / height - 0.5)
@@ -44,7 +45,7 @@ class RayTracer(val width: Int, val height: Int, val scene: Scene) {
         RNG.nextDouble.flatMap(d2 => {
           val sy = y + (0.5 + cy + tent(d2)) * 0.5
           val dir = scene.camera.ray.dir + camRay(sx, sy)
-          val ray = Ray(scene.camera.ray.origin, dir.normalise)
+          val ray = Ray(scene.camera.origin, dir.normalise)
           radiance(ray, 0)
         })
       })
@@ -58,32 +59,37 @@ class RayTracer(val width: Int, val height: Int, val scene: Scene) {
     } yield SuperSamp(aa, ba, ab, bb)
   }
 
-  def radiance(ray: Ray, depth: Int): RNG.Type[RGB] = {
+  // TODO @tailrec
+  final def radiance(ray: Ray, depth: Int): RNG.Type[RGB] = {
+
     scene.intersect(ray) match {
       case None => State.pure(RGB.Black)
       case Some((hitObject, hitPoint)) =>
-        val n = hitObject.normal(hitPoint)
+
+        val normal = hitObject.normal(hitPoint)
+        val color = hitObject.material.colour
+
         val nl =
-          if (n.dot(ray.dir) < 0)
-            n
+          if ((normal ∙ ray.dir) < 0)
+            normal
           else
-            -n
+            -normal
 
 
         val refl: RNG.Type[RGB] = {
-          val colour = hitObject.material.colour
 
           if (depth > 5) {
             // Modified Russian roulette.
-            val max = colour.max * Util.sqr(1.0 - depth / 200) // max to avoid stack overflow.
+            val max = color.max * Util.sqr(1.0 - depth / 200) // max to avoid stack overflow.
             RNG.nextDouble.flatMap(rnd => {
               if (rnd >= max)
                 State.pure(RGB.Black)
               else 
-                hitObject.material.radiance(this, ray, depth + 1, hitPoint, n, nl).map(_ * colour / max)
+                hitObject.material.radiance(this, ray, depth + 1, hitPoint, normal, nl).map(_ * color / max)
             })
-          } else {
-            hitObject.material.radiance(this, ray, depth + 1, hitPoint, n, nl).map(_ * colour)
+          }
+          else {
+            hitObject.material.radiance(this, ray, depth + 1, hitPoint, normal, nl).map(_ * color)
           }
         }
         refl.map(_ + hitObject.material.emission)

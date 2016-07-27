@@ -49,8 +49,8 @@ case class Diffuse(colour: RGB, emission: RGB) extends Material {
       val r1 = 2.0 * Pi * d1
       RNG.nextDouble.flatMap(r2 => {
         val r2s = sqrt(r2)
-        val u = (if (abs(w.x) > 0.1) Vector3.YUnit else Vector3.XUnit).cross(w).normalise
-        val v = w cross u
+        val u = (if (abs(w.x) > 0.1) Vector3.YUnit else Vector3.XUnit) × w.normalise
+        val v = w × u
         val d =
           u * math.cos(r1) * r2s +
           v * math.sin(r1) * r2s +
@@ -77,10 +77,10 @@ case class Refractive(colour: RGB, emission: RGB) extends Material {
     ): RNG.Type[RGB] = {
 
     val nt = 1.5
-    val reflRay = Ray(p, (ray.dir - n * 2.0 * n.dot(ray.dir)).normalise)
-    val into = n.dot(nl) > 0.0
+    val reflRay = Ray(p, (ray.dir - n * 2.0 * (n ∙ ray.dir)).normalise)
+    val into = (n ∙ nl) > 0.0
     val nnt = if (into) 1.0 / nt else nt
-    val ddn = ray.dir.dot(nl)
+    val ddn = ray.dir ∙ nl
     val cos2t = 1.0 - nnt * nnt * (1.0 - ddn * ddn)
 
     if (cos2t < 0.0)
@@ -89,7 +89,7 @@ case class Refractive(colour: RGB, emission: RGB) extends Material {
       val sign = if (into) 1.0 else -1.0
       val tdir = (ray.dir * nnt - n * (sign * (ddn * nnt + sqrt(cos2t)))).normalise
       val r0 = sqr(nt - 1.0) / sqr(nt + 1.0)
-      val c = 1.0 - (if (into) -ddn else tdir.dot(n))
+      val c = 1.0 - (if (into) -ddn else tdir ∙ n)
       val re = r0 + (1.0 - r0) * c * c * c * c * c
 
       val q = 0.25 + re / 2.0 // odds of being
@@ -118,7 +118,7 @@ case class Reflective(colour: RGB, emission: RGB) extends Material {
         nl: Vector3
     ): RNG.Type[RGB] = {
 
-    val d = ray.dir - n * 2 * (n dot ray.dir)
+    val d = ray.dir - n * 2 * (n ∙ ray.dir)
     rdr.radiance(Ray(p, d.normalise), depth)
   }
 }
