@@ -13,11 +13,15 @@ object Axis extends Enumeration {
   * but needs its dir parameter normalized wherever the constructor is called.
   * TODO FIX IT
   */
-case class Ray(origin: Point3, dir: Vector3) {
+class Ray protected (val r: Point3, val v: Vector3) {
 
-  def travels(length: Double): Point3 = origin + dir * length
+  def travels(length: Double): Point3 = r + v * length
 }
 
+object Ray {
+
+  def apply(r: Point3, v: Vector3): Ray = new Ray(r, v.normalise)
+}
 /**
   * Point3
   */
@@ -49,25 +53,22 @@ case class Point3(x: Double, y: Double, z: Double) {
   def lengthSquared = x*x + y*y + z*z
 
   def hasNaNs = x.isNaN || y.isNaN || z.isNaN
-
-  def asVector = Vector3(x, y, z)
 }
 
 /**
   * Vector3
   */
 object Vector3 {
-  final val Zero  = Vector3(0.0, 0.0, 0.0)
 
-  final val XUnit = Vector3(1.0, 0.0, 0.0)
-  final val YUnit = Vector3(0.0, 1.0, 0.0)
-  final val ZUnit = Vector3(0.0, 0.0, 1.0)
+  object XUnit extends Vector3(1.0, 0.0, 0.0)
+  object YUnit extends Vector3(0.0, 1.0, 0.0)
+  object ZUnit extends Vector3(0.0, 0.0, 1.0)
 
-  def unit(ax:Axis.Type): Vector3 = ax match {
-    case Axis.X => XUnit
-    case Axis.Y => YUnit
-    case Axis.Z => ZUnit
-  }
+//  def unit(ax: Axis.Type): Vector3 = ax match {
+//    case Axis.X => XUnit
+//    case Axis.Y => YUnit
+//    case Axis.Z => ZUnit
+//  }
 }
 
 case class Vector3(x: Double, y: Double, z: Double) {
@@ -84,9 +85,9 @@ case class Vector3(x: Double, y: Double, z: Double) {
 
   def -(that: Vector3): Vector3 = Vector3(x - that.x, y - that.y, z - that.z)
 
-  def *(s: Double): Vector3 = Vector3(x * s, y * s, z * s)
+  def *(n: Double): Vector3 = Vector3(x * n, y * n, z * n)
 
-  def /(s: Double): Vector3 = Vector3(x / s, y / s, z / s)
+  def /(n: Double): Vector3 = Vector3(x / n, y / n, z / n)
 
   def ∙(that: Vector3): Double = x * that.x + y * that.y + z * that.z
 
@@ -98,7 +99,6 @@ case class Vector3(x: Double, y: Double, z: Double) {
         )
 
   def length: Double = math.sqrt(lengthSquared)
-
 
   def lengthSquared: Double = x*x + y*y + z*z
 

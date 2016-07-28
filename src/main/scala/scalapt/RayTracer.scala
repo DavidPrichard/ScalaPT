@@ -8,6 +8,8 @@ import scala.annotation.tailrec
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
+import Util._
+
 object Concurrent {
 
   implicit final val ExCtx = ExecutionContext.fromExecutor(null)
@@ -32,7 +34,7 @@ object Concurrent {
 class RayTracer(val width: Int, val height: Int, val scene: Scene) {
 
   private val cx = Vector3(width * scene.camera.fov / height, 0.0, 0.0)
-  private val cy = cx × scene.camera.ray.dir.normalise * scene.camera.fov
+  private val cy = cx × scene.camera.dir.normalise * scene.camera.fov
 
   def camRay(x: Double, y: Double): Vector3 =
     cx * (x / width - 0.5) + cy * (y / height - 0.5)
@@ -44,8 +46,8 @@ class RayTracer(val width: Int, val height: Int, val scene: Scene) {
         val sx = x + (0.5 + cx + tent(d)) * 0.5
         RNG.nextDouble.flatMap(d2 => {
           val sy = y + (0.5 + cy + tent(d2)) * 0.5
-          val dir = scene.camera.ray.dir + camRay(sx, sy)
-          val ray = Ray(scene.camera.origin, dir.normalise)
+          val dir = scene.camera.dir + camRay(sx, sy)
+          val ray = Ray(scene.camera.pos, dir)
           radiance(ray, 0)
         })
       })
@@ -70,7 +72,7 @@ class RayTracer(val width: Int, val height: Int, val scene: Scene) {
         val color = hitObject.material.colour
 
         val nl =
-          if ((normal ∙ ray.dir) < 0)
+          if ((normal ∙ ray.v) < 0)
             normal
           else
             -normal
@@ -80,7 +82,7 @@ class RayTracer(val width: Int, val height: Int, val scene: Scene) {
 
           if (depth > 5) {
             // Modified Russian roulette.
-            val max = color.max * Util.sqr(1.0 - depth / 200) // max to avoid stack overflow.
+            val max = color.max * sqr(1.0 - depth / 200) // max to avoid stack overflow.
             RNG.nextDouble.flatMap(rnd => {
               if (rnd >= max)
                 State.pure(RGB.Black)

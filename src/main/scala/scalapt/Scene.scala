@@ -3,13 +3,14 @@ package scalapt
 /**
   * Camera
   */
-case class Camera(ray: Ray, fov: Double)
+case class Camera(pos: Point3, dir: Vector3, fov: Double)
+  extends Ray(pos, dir)
 
 /**
   * Scene
   */
 object Scene {
-  val distance = Ordering.by((_: (Shape, Double))._2)
+  val distance: Ordering[(Shape, Double)] = Ordering.by((_: (Shape, Double))._2)
 }
 
 case class Scene(camera: Camera, shapes: Vector[Shape]) {
