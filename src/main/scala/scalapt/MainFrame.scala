@@ -1,7 +1,7 @@
 package scalapt
 
 import java.awt._
-import java.awt.event.{MouseAdapter, MouseEvent, WindowAdapter, WindowEvent}
+import java.awt.event.{WindowAdapter, WindowEvent}
 import java.awt.image.BufferedImage
 import java.io.File
 import java.time.temporal.ChronoUnit
@@ -36,10 +36,10 @@ class MainFrame(
 
 
   val scene = SceneIO.load(inFile)
-  val ins = getInsets
+  val ins   = getInsets
 
   val rt         = new RayTracer(w, h, scene)
-  val renderData = new Array[Array[SuperSamp]](h)
+  val renderData = initialRenderData(w, h)
   val image      = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB)
 
   val gr2d = image.getGraphics
@@ -49,7 +49,6 @@ class MainFrame(
   var closing = false
 
   setupWindow()
-  setupHandlers()
 
   val began = DateTime.now()
 
@@ -65,10 +64,10 @@ class MainFrame(
 
   def render(iteration: Int) = {
 
-    Concurrent.For(0 until rt.height) { y =>
-      val row = new Array[SuperSamp](rt.width)
-      for (x <- 0 until rt.width) {
-        val seed = (x+y*rt.width)*(iteration+1)
+    Concurrent.For(0 until h) { y =>
+      val row = new Array[RGB](w)
+      for (x <- 0 until w) {
+        val seed = (x+y*w)*(iteration+1)
         row(x) = rt.render(x, y).runA(Random.randDouble(seed)).value
       }
 
@@ -87,9 +86,10 @@ class MainFrame(
     }
   }
 
-  private def merge(l: Array[SuperSamp], r: Array[SuperSamp], n: Int): Unit = {
+  private def merge(l: Array[RGB], r: Array[RGB], n: Int): Unit = {
     for (i <- l.indices)
       l(i) = l(i).merge(r(i), n)
+
   }
 
   override def paint(graphics: Graphics) = {
@@ -133,9 +133,6 @@ class MainFrame(
     setLocationRelativeTo(null)
     setBackground(Color.BLACK)
     setVisible(true)
-  }
-
-  private def setupHandlers(): Unit = {
 
     addWindowListener(new WindowAdapter() {
       override def windowClosing(we: WindowEvent) = {
@@ -144,17 +141,20 @@ class MainFrame(
       }
     })
 
-    addMouseListener(new MouseAdapter() {
-      override def mouseClicked(me: MouseEvent) = {
-        val x = me.getX - ins.left + 1
-        val y = h - (me.getY - ins.top) - 3
-
-        System.out.print(x + ": " + y + " -> ")
-
-        val ss = rt.render(x, y).runA(Random.randDouble(x+y*rt.width)).value
-        System.out.println(ss)
-      }
-    })
-
   }
+
+  // the default "render data" for the ray-tracing to be merged into
+  private def initialRenderData(width: Int, height: Int): Array[Array[RGB]] = {
+
+    val row = new Array[RGB](width).map(_ => RGB.Green)
+
+    println(s"Height is $h and initialRenderData has $height rows.")
+    println(s"Width is $w and initialRenderData has $width pixels per row")
+
+    val init = new Array[Array[RGB]](height)
+      .map(_ => row)
+
+    init
+  }
+
 }

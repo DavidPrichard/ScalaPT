@@ -7,12 +7,12 @@ import scala.math._
   */
 object RGB {
 
-  object Black extends RGB(0.0, 0.0, 0.0)
-  object White extends RGB(1.0, 1.0, 1.0)
+  val Black = RGB(0.0, 0.0, 0.0)
+  val White = RGB(1.0, 1.0, 1.0)
 
-  object Red   extends RGB(1.0, 0.0, 0.0)
-  object Green extends RGB(0.0, 1.0, 0.0)
-  object Blue  extends RGB(0.0, 0.0, 1.0)
+  val Red   = RGB(1.0, 0.0, 0.0)
+  val Green = RGB(0.0, 1.0, 0.0)
+  val Blue  = RGB(0.0, 0.0, 1.0)
 }
 
 case class RGB(red: Double, green: Double, blue: Double) {
@@ -37,6 +37,9 @@ case class RGB(red: Double, green: Double, blue: Double) {
 
   def clamp = map(x => Util.clamp(x))
 
+  // this calculates the running average, given that this rgb represents n samples/ is weighted by n
+  def merge(that: RGB, n: Double) = (this * n + that) / (n + 1)
+
   def toLinear(): RGB = map(x => pow(x, 2.2))
 
   def toGamma(): RGB = map(Gamma)
@@ -54,27 +57,4 @@ case class RGB(red: Double, green: Double, blue: Double) {
 
   override def toString = "{R: " + red + ", G: " + green + ", B: " + blue + "}"
 
-}
-
-/**
-  * SuperSamp is a 2x2 grid of colours, used for super-sampling.
-  */
-object SuperSamp {
-  object Black extends SuperSamp(RGB.Black, RGB.Black, RGB.Black, RGB.Black)
-}
-
-case class SuperSamp(c00: RGB, c10: RGB, c01: RGB, c11: RGB) {
-
-  def merge(that: SuperSamp, n: Int): SuperSamp =
-    SuperSamp(
-      (c00 * n + that.c00) / (n + 1),
-      (c10 * n + that.c10) / (n + 1),
-      (c01 * n + that.c01) / (n + 1),
-      (c11 * n + that.c11) / (n + 1)
-    )
-
-  def clamp: RGB = (c00.clamp + c10.clamp + c01.clamp + c11.clamp) * 0.25
-
-  def +(that: SuperSamp): SuperSamp =
-    SuperSamp(c00 + that.c00, c10 + that.c10, c01 + that.c01, c11 + that.c11)
 }

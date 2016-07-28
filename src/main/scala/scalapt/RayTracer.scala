@@ -9,6 +9,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
 import Util._
+import scalapt.RNG.Type
 
 object Concurrent {
 
@@ -29,17 +30,15 @@ object Concurrent {
 }
 
 /**
-  * Monte-Carlo path tracing renderer.
+  * Pseudo-Monte-Carlo path tracing renderer.
   */
 class RayTracer(val width: Int, val height: Int, val scene: Scene) {
 
   private val cx = Vector3(width * scene.camera.fov / height, 0.0, 0.0)
-  private val cy = cx × scene.camera.dir.normalise * scene.camera.fov
+  private val cy = cx × scene.camera.dir * scene.camera.fov
 
-  def camRay(x: Double, y: Double): Vector3 =
-    cx * (x / width - 0.5) + cy * (y / height - 0.5)
-
-  def render(x: Int, y: Int): RNG.Type[SuperSamp] = {
+  // sample the radiance of light coming from a particular pixel at (x,y)
+  def render(x: Int, y: Int): RNG.Type[RGB] = {
 
     def subPixelRad(cx: Double, cy: Double): RNG.Type[RGB] = {
       RNG.nextDouble.flatMap(d => {
@@ -58,10 +57,10 @@ class RayTracer(val width: Int, val height: Int, val scene: Scene) {
       ba <- subPixelRad(1, 0)
       ab <- subPixelRad(0, 1)
       bb <- subPixelRad(1, 1)
-    } yield SuperSamp(aa, ba, ab, bb)
+    } yield (aa + ba + ab + bb) / 4
   }
 
-  // TODO @tailrec
+  //@tailrec
   final def radiance(ray: Ray, depth: Int): RNG.Type[RGB] = {
 
     scene.intersect(ray) match {
@@ -94,9 +93,15 @@ class RayTracer(val width: Int, val height: Int, val scene: Scene) {
             hitObject.material.radiance(this, ray, depth + 1, hitPoint, normal, nl).map(_ * color)
           }
         }
-        refl.map(_ + hitObject.material.emission)
+
+        refl.map(x => x + hitObject.material.emission)
     }
   }
+
+  def camRay(x: Double, y: Double): Vector3 =
+    cx * (x / width - 0.5) +
+      cy * (y / height - 0.5)
+
 
   private def tent(x: Double): Double = {
     if (x < 0.5)
