@@ -33,9 +33,9 @@ case class Sphere(
                  ) extends Shape {
 
   override def intersect(ray: Ray): Option[Double] = {
-    val e = ray.origin - centre
-    val f = ray.dir dot e
-    val dsquared = f*f - (e dot e) + radius*radius
+    val e = ray.r - centre
+    val f = ray.v ∙ e
+    val dsquared = f*f - (e ∙ e) + radius*radius
 
     if (dsquared > 0.0) {
       val determinant = math.sqrt(dsquared)
@@ -67,8 +67,8 @@ case class Plane(
 ) extends Shape {
 
   def intersect(ray: Ray): Option[Double] = {
-    if ((math.abs(ray.dir(side)) > Double.MinPositiveValue) && ((ray.origin(side) > v) == posFacing)) {
-      val t = (v - ray.origin(side)) / ray.dir(side)
+    if ((math.abs(ray.v(side)) > Double.MinPositiveValue) && ((ray.r(side) > v) == posFacing)) {
+      val t = (v - ray.r(side)) / ray.v(side)
       if (t > ε)
         Some(t)
       else
