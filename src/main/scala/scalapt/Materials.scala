@@ -36,7 +36,7 @@ trait Material {
   */
 case class Diffuse(colour: RGB, emission: RGB) extends Material {
 
-  override def radiance(
+  def radiance(
         rdr: RayTracer,
         ray: Ray,
         depth: Int,
@@ -67,7 +67,7 @@ case class Diffuse(colour: RGB, emission: RGB) extends Material {
   */
 case class Refractive(colour: RGB, emission: RGB) extends Material {
 
-  override def radiance(
+  def radiance(
         rt: RayTracer,
         ray: Ray,
         depth: Int,
@@ -109,7 +109,7 @@ case class Refractive(colour: RGB, emission: RGB) extends Material {
   * Reflective
   */
 case class Reflective(colour: RGB, emission: RGB) extends Material {
-  override def radiance(
+  def radiance(
         rdr: RayTracer,
         ray: Ray,
         depth: Int,
