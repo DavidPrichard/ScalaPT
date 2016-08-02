@@ -16,30 +16,9 @@
     {
       "type": "Plane",
       "name": "ground",
-      "material": {
+      "mat": {
         "type": "Diffuse",
-        "colour": {
-          "red": 0.999,
-          "green": 0.999,
-          "blue": 0.999
-        },
-        "emission": {
-          "red": 0.0,
-          "green": 0.0,
-          "blue": 0.0
-        },
-        "emissive": false
-      },
-      "side": "Y",
-      "posFacing": true,
-      "v": 0.0
-    },
-    {
-      "type": "Sphere",
-      "name": "refl",
-      "material": {
-        "type": "Reflective",
-        "colour": {
+        "color": {
           "red": 0.999,
           "green": 0.999,
           "blue": 0.999
@@ -50,7 +29,27 @@
           "blue": 0.0
         }
       },
-      "centre": {
+      "side": "Y",
+      "posFacing": true,
+      "v": 0.0
+    },
+    {
+      "type": "Sphere",
+      "name": "refl",
+      "mat": {
+        "type": "Reflective",
+        "color": {
+          "red": 0.999,
+          "green": 0.999,
+          "blue": 0.999
+        },
+        "emission": {
+          "red": 0.0,
+          "green": 0.0,
+          "blue": 0.0
+        }
+      },
+      "center": {
         "x": 0.0,
         "y": 66.66666666666667,
         "z": -66.66666666666667
@@ -60,9 +59,9 @@
     {
       "type": "Sphere",
       "name": "lglass",
-      "material": {
+      "mat": {
         "type": "Refractive",
-        "colour": {
+        "color": {
           "red": 0.75,
           "green": 0.25,
           "blue": 0.25
@@ -73,7 +72,7 @@
           "blue": 0.0
         }
       },
-      "centre": {
+      "center": {
         "x": -66.66666666666667,
         "y": 25.0,
         "z": 100.0
@@ -83,9 +82,9 @@
     {
       "type": "Sphere",
       "name": "mglass",
-      "material": {
+      "mat": {
         "type": "Refractive",
-        "colour": {
+        "color": {
           "red": 0.25,
           "green": 0.75,
           "blue": 0.25
@@ -96,7 +95,7 @@
           "blue": 0.0
         }
       },
-      "centre": {
+      "center": {
         "x": 0.0,
         "y": 25.0,
         "z": 150.0
@@ -106,9 +105,9 @@
     {
       "type": "Sphere",
       "name": "rglass",
-      "material": {
+      "mat": {
         "type": "Refractive",
-        "colour": {
+        "color": {
           "red": 0.25,
           "green": 0.25,
           "blue": 0.75
@@ -119,7 +118,7 @@
           "blue": 0.0
         }
       },
-      "centre": {
+      "center": {
         "x": 66.66666666666667,
         "y": 25.0,
         "z": 100.0
@@ -129,9 +128,9 @@
     {
       "type": "Sphere",
       "name": "light",
-      "material": {
+      "mat": {
         "type": "Diffuse",
-        "colour": {
+        "color": {
           "red": 0.0,
           "green": 0.0,
           "blue": 0.0
@@ -140,10 +139,9 @@
           "red": 12.0,
           "green": 12.0,
           "blue": 12.0
-        },
-        "emissive": true
+        }
       },
-      "centre": {
+      "center": {
         "x": 0.0,
         "y": 225.0,
         "z": 0.0
@@ -153,9 +151,9 @@
     {
       "type": "Sphere",
       "name": "sky",
-      "material": {
+      "mat": {
         "type": "Diffuse",
-        "colour": {
+        "color": {
           "red": 0.52734375,
           "green": 0.8046875,
           "blue": 0.9765625
@@ -164,10 +162,9 @@
           "red": 0.0,
           "green": 0.0,
           "blue": 0.0
-        },
-        "emissive": false
+        }
       },
-      "centre": {
+      "center": {
         "x": 0.0,
         "y": 1900.0,
         "z": 0.0

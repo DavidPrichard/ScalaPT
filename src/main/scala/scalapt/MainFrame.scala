@@ -12,7 +12,7 @@ import javax.imageio.ImageIO
 object MainFrame {
   def main(args: Array[String]): Unit = {
 
-    val inFile     = if (args.length > 0) args(0) else "scenes/horizon2.json"
+    val inFile     = if (args.length > 0) args(0) else "scenes/horizon.json"
     val width      = if (args.length > 1) Integer.parseInt(args(1)) else 1024
     val height     = if (args.length > 2) Integer.parseInt(args(2)) else 768
     val iterations = if (args.length > 3) Integer.parseInt(args(3)) else 1024
@@ -55,6 +55,7 @@ class MainFrame(
   for (i <- 0 until iterations) {
     if (!closing) {
       render(i)
+      //repaint()
       printStatus(i+1)
     }
   }
@@ -68,7 +69,7 @@ class MainFrame(
       val row = new Array[RGB](w)
       for (x <- 0 until w) {
         val seed = (x+y*w)*(iteration+1)
-        row(x) = rt.render(x, y).runA(Random.randDouble(seed)).value
+        row(x) = rt.sample(x, y, new XorShift(seed))
       }
 
       if (iteration == 0)
@@ -80,7 +81,7 @@ class MainFrame(
 
       val sy = h - y - 1
 
-      for (sx <- 0 until w) image.setRGB(sx, sy, mergedRow(sx).clamp.outputColour())
+      for (sx <- 0 until w) image.setRGB(sx, sy, mergedRow(sx).clamp.outputColour)
 
       repaint(ins.left, ins.top + sy, w, 1)
     }
@@ -100,8 +101,8 @@ class MainFrame(
 
   private def printStatus(iteration: Int): Unit = {
 
-    val mean = ChronoUnit.SECONDS.between(began, DateTime.now()) / iteration
-    println(s"Iteration: $iteration, Time per iteration: $mean seconds, Samples per pixel: ")
+    val mean = ChronoUnit.MILLIS.between(began, DateTime.now()) / iteration
+    println(s"Iteration: $iteration, Time per iteration: $mean ms.")
   }
 
   private def saveImage(outFile: Option[File]): Unit = {

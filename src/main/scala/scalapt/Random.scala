@@ -1,62 +1,39 @@
 package scalapt
 
-import cats.data.State
+object RNG {
+  final val Scale = Long.MaxValue.toDouble - Long.MinValue.toDouble + 1.0
+}
 
 trait RNG[T] {
-  def next: (RNG[T], T)
+  def next: T
 }
 
-object RNG {
-  type Type[T] = State[RNG[Double], T]
+//class DoubleRNG(rng: RNG[Long]) extends RNG[Double] {
+//  import RNG._
+//
+//  def next: (DoubleRNG, Double) = {
+//    val (rng2, rl) = rng.next
+//    val dl = (rl.toDouble - Long.MinValue.toDouble) / Scale
+//    (new DoubleRNG(rng2), dl)
+//  }
+//}
 
-  def nextDouble: Type[Double] = State(rng => rng.next)
-}
+// XorShift64*, a relatively fast PRNG with better output than an LCG.
+// Look into xoroshiro128+ for an upgrade: http://xoroshiro.di.unimi.it/
+case class XorShift(var seed: Long) extends RNG[Long] {
+  import RNG._
 
-object RandomLCG {
-  final val Mult = 214013L
-  final val Inc = 2531011L
-  final val Mod = 0x100000000L
-  final val Scale = Int.MaxValue.toDouble - Int.MinValue.toDouble + 1.0
-}
-
-case class RandomLCG(seed: Long = 0) extends RNG[Double] {
-  import RandomLCG._
-
-  override def next: (RNG[Double], Double) = {
-    val seed2 = (Mult * seed + Inc) % Mod
-    (RandomLCG(seed2), seed2 / Scale)
-  }
-}
-
-case class XorShiftRNG(seed: Long) extends RNG[Long] {
-  import XorShiftRNG._
-
-  override def next: (RNG[Long], Long) = {
+  def next: Long = {
     val a = seed ^ (seed >>> 12)
     val b = a ^ (a << 25)
     val c = b ^ (b >>> 27)
-    val d = if (c == 0) -1 else c
-        (XorShiftRNG(d), d * 2685821657736338717L)
+    seed = if (c == 0) -1 else c
+
+    seed * 2685821657736338717L
   }
-}
 
-object DoubleRNG {
-  final val Scale = Long.MaxValue.toDouble - Long.MinValue.toDouble + 1.0
-  final val Mod = 1L << 64
-}
-
-case class DoubleRNG(rng: RNG[Long]) extends RNG[Double] {
-  import DoubleRNG._
-
-  override def next: (RNG[Double], Double) = {
-    val (rng2, rl) = rng.next
-    val dl = (rl.toDouble - Long.MinValue.toDouble) / Scale
-        (DoubleRNG(rng2), dl)
-  }
-}
-
-object Random {
-  def randLong(seed: Long): RNG[Long] = XorShiftRNG(seed)
-
-  def randDouble(seed: Long): RNG[Double] = DoubleRNG(XorShiftRNG(seed))
+  // next with returned long scaled down to a double in [0,1]
+  // (it may be better to find a PRNG that directly generates numbers in the unit interval)
+  // this one may produce bias towards 0 given the varying precision of a Double.
+  def next0to1: Double = (next.toDouble - Long.MinValue.toDouble) / Scale
 }

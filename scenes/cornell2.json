@@ -16,9 +16,9 @@
     {
       "type": "Plane",
       "name": "left",
-      "material": {
+      "mat": {
         "type": "Diffuse",
-        "colour": {
+        "color": {
           "red": 0.75,
           "green": 0.25,
           "blue": 0.25
@@ -27,8 +27,7 @@
           "red": 0.0,
           "green": 0.0,
           "blue": 0.0
-        },
-        "emissive": false
+        }
       },
       "side": "X",
       "posFacing": true,
@@ -37,9 +36,9 @@
     {
       "type": "Plane",
       "name": "right",
-      "material": {
+      "mat": {
         "type": "Diffuse",
-        "colour": {
+        "color": {
           "red": 0.25,
           "green": 0.25,
           "blue": 0.75
@@ -48,8 +47,7 @@
           "red": 0.0,
           "green": 0.0,
           "blue": 0.0
-        },
-        "emissive": false
+        }
       },
       "side": "X",
       "posFacing": false,
@@ -58,9 +56,9 @@
     {
       "type": "Plane",
       "name": "back",
-      "material": {
+      "mat": {
         "type": "Diffuse",
-        "colour": {
+        "color": {
           "red": 0.75,
           "green": 0.75,
           "blue": 0.75
@@ -69,8 +67,7 @@
           "red": 0.0,
           "green": 0.0,
           "blue": 0.0
-        },
-        "emissive": false
+        }
       },
       "side": "Z",
       "posFacing": true,
@@ -79,9 +76,9 @@
     {
       "type": "Plane",
       "name": "front",
-      "material": {
+      "mat": {
         "type": "Diffuse",
-        "colour": {
+        "color": {
           "red": 0.0,
           "green": 0.0,
           "blue": 0.0
@@ -90,8 +87,7 @@
           "red": 0.0,
           "green": 0.0,
           "blue": 0.0
-        },
-        "emissive": false
+        }
       },
       "side": "Z",
       "posFacing": false,
@@ -100,9 +96,9 @@
     {
       "type": "Plane",
       "name": "bottom",
-      "material": {
+      "mat": {
         "type": "Diffuse",
-        "colour": {
+        "color": {
           "red": 0.75,
           "green": 0.75,
           "blue": 0.75
@@ -111,8 +107,7 @@
           "red": 0.0,
           "green": 0.0,
           "blue": 0.0
-        },
-        "emissive": false
+        }
       },
       "side": "Y",
       "posFacing": true,
@@ -121,9 +116,9 @@
     {
       "type": "Plane",
       "name": "top",
-      "material": {
+      "mat": {
         "type": "Diffuse",
-        "colour": {
+        "color": {
           "red": 0.75,
           "green": 0.75,
           "blue": 0.75
@@ -132,8 +127,7 @@
           "red": 0.0,
           "green": 0.0,
           "blue": 0.0
-        },
-        "emissive": false
+        }
       },
       "side": "Y",
       "posFacing": false,
@@ -142,9 +136,9 @@
     {
       "type": "Sphere",
       "name": "mirror",
-      "material": {
+      "mat": {
         "type": "Reflective",
-        "colour": {
+        "color": {
           "red": 0.999,
           "green": 0.999,
           "blue": 0.999
@@ -155,7 +149,7 @@
           "blue": 0.0
         }
       },
-      "centre": {
+      "center": {
         "x": 27.0,
         "y": 60.0,
         "z": 47.0
@@ -165,9 +159,9 @@
     {
       "type": "Sphere",
       "name": "glass",
-      "material": {
+      "mat": {
         "type": "Refractive",
-        "colour": {
+        "color": {
           "red": 0.999,
           "green": 0.999,
           "blue": 0.999
@@ -178,7 +172,7 @@
           "blue": 0.0
         }
       },
-      "centre": {
+      "center": {
         "x": 73.0,
         "y": 16.5,
         "z": 78.0
@@ -188,9 +182,9 @@
     {
       "type": "Sphere",
       "name": "diff",
-      "material": {
+      "mat": {
         "type": "Diffuse",
-        "colour": {
+        "color": {
           "red": 0.75,
           "green": 0.75,
           "blue": 0.25
@@ -199,10 +193,9 @@
           "red": 0.0,
           "green": 0.0,
           "blue": 0.0
-        },
-        "emissive": false
+        }
       },
-      "centre": {
+      "center": {
         "x": 27.0,
         "y": 16.5,
         "z": 100.0
@@ -212,9 +205,9 @@
     {
       "type": "Sphere",
       "name": "light",
-      "material": {
+      "mat": {
         "type": "Diffuse",
-        "colour": {
+        "color": {
           "red": 0.0,
           "green": 0.0,
           "blue": 0.0
@@ -223,10 +216,9 @@
           "red": 12.0,
           "green": 12.0,
           "blue": 12.0
-        },
-        "emissive": true
+        }
       },
-      "centre": {
+      "center": {
         "x": 50.0,
         "y": 681.33,
         "z": 81.6

@@ -3,7 +3,7 @@ package scalapt
 /**
   * Camera
   */
-case class Camera(pos: Point3, dir: Vector3, fov: Double)
+case class Camera(pos: Point3, override val dir: Vector3, fov: Double)
   extends Ray(pos, dir)
 
 /**

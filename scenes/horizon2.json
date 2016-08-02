@@ -16,9 +16,9 @@
     {
       "type" : "Plane",
       "name" : "ground",
-      "material" : {
+      "mat" : {
         "type" : "Diffuse",
-        "colour" : {
+        "color" : {
           "red" : 0.999,
           "green" : 0.999,
           "blue" : 0.999
@@ -36,9 +36,9 @@
     {
       "type" : "Sphere",
       "name" : "refl",
-      "material" : {
+      "mat" : {
         "type" : "Reflective",
-        "colour" : {
+        "color" : {
           "red" : 0.999,
           "green" : 0.99,
           "blue" : 0.98
@@ -49,7 +49,7 @@
           "blue" : 0.0
         }
       },
-      "centre" : {
+      "center" : {
         "x" : 0.0,
         "y" : 66.66666666666667,
         "z" : -66.66666666666667
@@ -59,9 +59,9 @@
     {
       "type" : "Sphere",
       "name" : "leftglass",
-      "material" : {
+      "mat" : {
         "type" : "Refractive",
-        "colour" : {
+        "color" : {
           "red" : 0.5,
           "green" : 0.0,
           "blue" : 0.0
@@ -72,7 +72,7 @@
           "blue" : 0.0
         }
       },
-      "centre" : {
+      "center" : {
         "x" : -66.66666666666667,
         "y" : 25.0,
         "z" : 100.0
@@ -82,9 +82,9 @@
     {
       "type" : "Sphere",
       "name" : "middleglass",
-      "material" : {
+      "mat" : {
         "type" : "Refractive",
-        "colour" : {
+        "color" : {
           "red" : 0.25,
           "green" : 0.75,
           "blue" : 0.25
@@ -95,7 +95,7 @@
           "blue" : 0.0
         }
       },
-      "centre" : {
+      "center" : {
         "x" : 0.0,
         "y" : 25.0,
         "z" : 150.0
@@ -105,9 +105,9 @@
     {
       "type" : "Sphere",
       "name" : "rightglass",
-      "material" : {
+      "mat" : {
         "type" : "Refractive",
-        "colour" : {
+        "color" : {
           "red" : 0.5,
           "green" : 0.1,
           "blue" : 0.8
@@ -118,7 +118,7 @@
           "blue" : 0.0
         }
       },
-      "centre" : {
+      "center" : {
         "x" : 66.66666666666667,
         "y" : 40.0,
         "z" : 100.0
@@ -128,9 +128,9 @@
     {
       "type" : "Sphere",
       "name" : "light",
-      "material" : {
+      "mat" : {
         "type" : "Diffuse",
-        "colour" : {
+        "color" : {
           "red" : 0.0,
           "green" : 0.0,
           "blue" : 0.0
@@ -141,7 +141,7 @@
           "blue" : 14.0
         }
       },
-      "centre" : {
+      "center" : {
         "x" : 0.0,
         "y" : 225.0,
         "z" : 0.0
@@ -151,9 +151,9 @@
     {
       "type" : "Sphere",
       "name" : "sky",
-      "material" : {
+      "mat" : {
         "type" : "Diffuse",
-        "colour" : {
+        "color" : {
           "red" : 0.52734375,
           "green" : 0.8046875,
           "blue" : 0.9765625
@@ -164,7 +164,7 @@
           "blue" : 0.0
         }
       },
-      "centre" : {
+      "center" : {
         "x" : 0.0,
         "y" : 1900.0,
         "z" : 0.0

@@ -9,19 +9,16 @@ object Axis extends Enumeration {
 }
 
 /**
-  * Ray; has to be a case class for automatic Circe json serialization,
-  * but needs its dir parameter normalized wherever the constructor is called.
-  * TODO FIX IT
+  * Ray
   */
-class Ray protected (val r: Point3, val v: Vector3) {
+class Ray(val r: Point3, v: Vector3) {
 
-  def travels(length: Double): Point3 = r + v * length
+  val dir = v.normalize
+
+  def travels(length: Double): Point3 = r + dir * length
 }
 
-object Ray {
 
-  def apply(r: Point3, v: Vector3): Ray = new Ray(r, v.normalise)
-}
 /**
   * Point3
   */
@@ -102,7 +99,7 @@ case class Vector3(x: Double, y: Double, z: Double) {
 
   def lengthSquared: Double = x*x + y*y + z*z
 
-  def normalise: Vector3 = this * (1.0 / length)
+  def normalize: Vector3 = this * (1.0 / length)
 
   def hasNaNs: Boolean = x.isNaN || y.isNaN || z.isNaN
 }

@@ -2,14 +2,9 @@ package scalapt
 
 import java.util.concurrent.TimeUnit
 
-import cats.data.State
-
 import scala.annotation.tailrec
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
-
-import Util._
-import scalapt.RNG.Type
 
 object Concurrent {
 
@@ -31,76 +26,70 @@ object Concurrent {
 
 /**
   * Pseudo-Monte-Carlo path tracing renderer.
+  *
+  * The RNG must produce uncorrelated, uniformly distributed numbers in [0,1]
   */
 class RayTracer(val width: Int, val height: Int, val scene: Scene) {
 
   private val cx = Vector3(width * scene.camera.fov / height, 0.0, 0.0)
   private val cy = cx × scene.camera.dir * scene.camera.fov
 
-  // sample the radiance of light coming from a particular pixel at (x,y)
-  def render(x: Int, y: Int): RNG.Type[RGB] = {
+  println("camera dir = " + scene.camera.dir)
+  println("camera fov = " + scene.camera.fov)
+  println(s"cx = $cx")
+  println(s"cy = $cy")
+  println("camray for (0,0) =" + camRay(0,0))
+  println("camray for (1,1) =" + camRay(1,1))
+  println("camray for (128,128) =" + camRay(128,128))
 
-    def subPixelRad(cx: Double, cy: Double): RNG.Type[RGB] = {
-      RNG.nextDouble.flatMap(d => {
-        val sx = x + (0.5 + cx + tent(d)) * 0.5
-        RNG.nextDouble.flatMap(d2 => {
-          val sy = y + (0.5 + cy + tent(d2)) * 0.5
-          val dir = scene.camera.dir + camRay(sx, sy)
-          val ray = Ray(scene.camera.pos, dir)
-          radiance(ray, 0)
-        })
-      })
-    }
 
-    for {
-      aa <- subPixelRad(0, 0)
-      ba <- subPixelRad(1, 0)
-      ab <- subPixelRad(0, 1)
-      bb <- subPixelRad(1, 1)
-    } yield (aa + ba + ab + bb) / 4
+  // sample the radiance of light from a particular pixel at (x,y)
+  def sample(x: Int, y: Int, rng: XorShift): RGB = {
+
+      val subx = x + rng.next0to1
+      val suby = y + rng.next0to1
+      val dir = scene.camera.dir + camRay(subx, suby)
+      //println(s"Ray direction component: $dir")
+      radiance(new Ray(scene.camera.pos, dir), rng)
   }
 
-  //@tailrec
-  final def radiance(ray: Ray, depth: Int): RNG.Type[RGB] = {
+  // tail-recursive version of ScalaPT's radiance function.
+  // russian roulette's max could be removed, now that there is no danger of blowing the stack
+  // russian roulette now takes into account the normalized previous color * current color,
+  // so it should terminate more aggressively now.
+  // Further advantages:
+  // the output can be altered in interesting/valuable ways by passing different initial arguments
+  // z.B. the attenuation, if it is set to RGB(1.0, 0.0, 0.0) will return on the red value detected in
+  // the scene, but the russian roulette termination will also take this into account, as the
+  // attenuation for green and blue will always be 0.
+  @tailrec
+  final def radiance(ray: Ray,
+                     rng: XorShift,
+                     accumulatedLight: RGB = RGB.Black,
+                     attenuation: RGB = RGB.White
+                    ): RGB = {
 
     scene.intersect(ray) match {
-      case None => State.pure(RGB.Black)
-      case Some((hitObject, hitPoint)) =>
+      case None => accumulatedLight
+      case Some((obj, hitpoint)) =>
 
-        val normal = hitObject.normal(hitPoint)
-        val color = hitObject.material.colour
+        val color  = obj.mat.color * attenuation // fraction of light unabsorbed by this and previous materials
 
-        val nl =
-          if ((normal ∙ ray.v) < 0)
-            normal
-          else
-            -normal
-
-
-        val refl: RNG.Type[RGB] = {
-
-          if (depth > 5) {
-            // Modified Russian roulette.
-            val max = color.max * sqr(1.0 - depth / 200) // max to avoid stack overflow.
-            RNG.nextDouble.flatMap(rnd => {
-              if (rnd >= max)
-                State.pure(RGB.Black)
-              else 
-                hitObject.material.radiance(this, ray, depth + 1, hitPoint, normal, nl).map(_ * color / max)
-            })
-          }
-          else {
-            hitObject.material.radiance(this, ray, depth + 1, hitPoint, normal, nl).map(_ * color)
-          }
-        }
-
-        refl.map(x => x + hitObject.material.emission)
+        // Russian roulette termination; converts intensity of light to odds of continuing recursion.
+        // that is: if the unabsorbed light is 0.70, that is normalized to 1.0,
+        // but the light is given only a 70% chance to continue recursion.
+        if (rng.next0to1 > color.max)
+          accumulatedLight + (obj.mat.emission * attenuation)
+        else
+          radiance(
+            obj.deflect(ray, hitpoint, rng.next0to1, rng.next0to1),
+            rng,
+            accumulatedLight + (obj.mat.emission * attenuation),
+            color/color.max)
     }
   }
 
-  def camRay(x: Double, y: Double): Vector3 =
-    cx * (x / width - 0.5) +
-      cy * (y / height - 0.5)
+  def camRay(x: Double, y: Double): Vector3 = cx * (x/width - 0.5) + cy * (y/height - 0.5)
 
 
   private def tent(x: Double): Double = {

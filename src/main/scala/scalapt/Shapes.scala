@@ -1,74 +1,77 @@
 package scalapt
 
 import Shape._
+import math._
+
 /**
   * Shape
   */
 object Shape {
-  /**
-    * Epsilon value to avoid object self-intersection.
-    */
+
+  // Epsilon value to avoid object self-intersection.
   final val ε = 1e-4
 }
 
 trait Shape {
 
   val name: String // For debugging.
-
-  val material: Material
+  val mat: Material
 
   def intersect(ray: Ray): Option[Double]
-
   def normal(p: Point3): Vector3
+
+  def deflect(ray: Ray, point: Point3, rand1: Double, rand2: Double): Ray = {
+
+    val n = normal(point)
+    val orientedN = if ((n ∙ ray.dir) < 0) n else -n
+
+    new Ray(point, mat.deflect(ray.dir, n, orientedN, rand1, rand2))
+  }
 }
 
 /**
   * Sphere
   */
 case class Sphere(
-  name: String,
-  material: Material,
-  centre: Point3,
-  radius: Double
-                 ) extends Shape {
+    name: String,
+    mat: Material,
+    center: Point3,
+    radius: Double
+) extends Shape {
 
   override def intersect(ray: Ray): Option[Double] = {
-    val e = ray.r - centre
-    val f = ray.v ∙ e
-    val dsquared = f*f - (e ∙ e) + radius*radius
+    val e = ray.r - center
+    val f = ray.dir ∙ e
+    val dsquared = f*f - (e∙e) + radius*radius // = discriminant squared
 
     if (dsquared > 0.0) {
-      val determinant = math.sqrt(dsquared)
-      val t = -f - determinant
-      if (t > ε)
-        Some(t)
-      else
-        None
+      val t = -f - sqrt(dsquared)
+      if (t > ε) Some(t) else None
     }
     else
       None
 
   }
 
-  def normal(p: Point3) = (p - centre).normalise
+  def normal(p: Point3) = (p - center).normalize
 
 }
 
 /**
   * An axis-aligned infinite plane.
-  * Allows light through in one direction (controlled by posFacing)
+  * Allows light through in one direction, determined by posFacing.
   */
 case class Plane(
     name: String,
-    material: Material,
+    mat: Material,
     side: Axis.Type,
     posFacing: Boolean,
     v: Double
 ) extends Shape {
 
   def intersect(ray: Ray): Option[Double] = {
-    if ((math.abs(ray.v(side)) > Double.MinPositiveValue) && ((ray.r(side) > v) == posFacing)) {
-      val t = (v - ray.r(side)) / ray.v(side)
+    if ((abs(ray.dir(side)) > Double.MinPositiveValue) && ((ray.r(side) > v) == posFacing)) {
+      val t = (v - ray.r(side)) / ray.dir(side)
       if (t > ε)
         Some(t)
       else

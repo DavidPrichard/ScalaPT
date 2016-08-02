@@ -3,7 +3,7 @@ package scalapt
 import scala.math._
 
 /**
-  * A triple of colour coefficients.
+  * A triple of color coefficients.
   */
 object RGB {
 
@@ -15,11 +15,11 @@ object RGB {
   val Blue  = RGB(0.0, 0.0, 1.0)
 }
 
+// three doubles in the unit interval (0,1) representing the portion of unabsorbed light in that band.
+// so RGB(0.0, 1.0, 0.5) represents 0% red, 100% green, and 50% blue of a light source/ray/etc,
 case class RGB(red: Double, green: Double, blue: Double) {
 
-
   private def map(f: Double => Double): RGB = RGB(f(red), f(green), f(blue))
-
 
   def +(that: RGB) = RGB(this.red + that.red, this.green + that.green, this.blue + that.blue)
 
@@ -40,14 +40,14 @@ case class RGB(red: Double, green: Double, blue: Double) {
   // this calculates the running average, given that this rgb represents n samples/ is weighted by n
   def merge(that: RGB, n: Double) = (this * n + that) / (n + 1)
 
-  def toLinear(): RGB = map(x => pow(x, 2.2))
+  def toLinear: RGB = map(x => pow(x, 2.2))
 
-  def toGamma(): RGB = map(Gamma)
+  def toGamma: RGB = map(Gamma)
 
   val Gamma = (x: Double) => pow(x, 1.0 / 2.2)
 
-  def outputColour(): Int = {
-    val g = this.toGamma()
+  def outputColour: Int = {
+    val g = this.toGamma
 
     // maps a 0.0-1.0 double color to 0-256 integer color
     def to8bit = (d: Double) => (d * 255.0 + 0.5).toInt // Util.clamp(val, 0, 255)
