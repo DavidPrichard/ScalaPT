@@ -1,6 +1,6 @@
 package scalapt
 
-import Util._
+import Util.sqr
 import math._
 
 /**
@@ -57,34 +57,27 @@ case class Refractive(color: RGB, emission: RGB) extends Material {
   // ideal refraction
   def deflect(in: Vector3, n: Vector3, orientedN: Vector3, rand1: Double, rand2: Double): Vector3 = {
 
-    val into = (n ∙ orientedN) > 0.0
-
-    val nt = 1.5
-    val nnt = if (into) 1.0 / nt else nt
+    val n1 = 1.5 // ~refractive index of glass
+    val n2 = 1.0 // ~refractive index of air
+    val into = (n ∙ orientedN) > 0.0 // if ray is exiting or entering.
+    val nnt = if (into) n2/n1 else n1/n2
     val ddn = in ∙ orientedN
-    val cos2t = 1.0 - nnt * nnt * (1.0 - ddn * ddn)
 
-    if (cos2t < 0.0)
-      specReflect(in, n) // Total internal reflection
+    val cos2t = 1.0 - sqr(nnt) * (1.0 - sqr(ddn))
+    if (cos2t < 0.0) {
+      println("FUCK YES")
+      specReflect(in, n) // total internal reflection
+    }
     else {
       val sign = if (into) 1.0 else -1.0
-      val tdir = (in * nnt - n * (sign * (ddn * nnt + sqrt(cos2t)))).normalize
-      val r0 = sqr(nt - 1.0) / sqr(nt + 1.0)
-      val c = 1.0 - (if (into) -ddn else tdir ∙ n)
-      val re = r0 + (1.0 - r0) * c * c * c * c * c
+      val refracted = (in * nnt - n * (sign * (ddn * nnt + sqrt(cos2t)))).normalize // refracted ray
+      val cosθ = if (into) -ddn else refracted ∙ n
 
-      if (rand1 < (0.25 + re / 2.0))
-        specReflect(in, n)
-      else
-        tdir
+      // Schlick's Approximation
+      val r0 = sqr((n1 - n2) / (n1 + n2)) // reflectance at normal (head-on) // = 0.04 for glass&air
+      val re = r0 + (1.0 - r0) * pow(1.0 - cosθ, 5) // fresnel reflectance
 
-//      previous implementation. importance sampling!
-//      rnd = RNG.nextDouble
-//      if (rnd < q)
-//        rt.radiance(reflRay, depth) * (re / q))
-//      else
-//        rt.radiance(Ray(p, tdir), depth) * ((1.0 - re) / (1.0 - q)))
-
+      if (rand1 < re) specReflect(in, n) else refracted
     }
   }
 }

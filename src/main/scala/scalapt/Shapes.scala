@@ -9,7 +9,7 @@ import math._
 object Shape {
 
   // Epsilon value to avoid object self-intersection.
-  final val ε = 1e-4
+  final val ε = 1e-6
 }
 
 trait Shape {
@@ -17,13 +17,13 @@ trait Shape {
   val name: String // For debugging.
   val mat: Material
 
-  def intersect(ray: Ray): Option[Double]
+  def intersect(ray: Ray): Option[(Shape, Double)]
   def normal(p: Point3): Vector3
 
   def deflect(ray: Ray, point: Point3, rand1: Double, rand2: Double): Ray = {
 
     val n = normal(point)
-    val orientedN = if ((n ∙ ray.dir) < 0) n else -n
+    val orientedN = if ((n ∙ ray.dir) < 0.0) n else -n // (n ∙ ray.dir) is always negative
 
     new Ray(point, mat.deflect(ray.dir, n, orientedN, rand1, rand2))
   }
@@ -39,14 +39,23 @@ case class Sphere(
     radius: Double
 ) extends Shape {
 
-  override def intersect(ray: Ray): Option[Double] = {
+  def intersect(ray: Ray): Option[(Shape, Double)] = {
     val e = ray.r - center
     val f = ray.dir ∙ e
-    val dsquared = f*f - (e∙e) + radius*radius // = discriminant squared
+    val d2 = f*f - (e∙e) + radius*radius // = discriminant squared
 
-    if (dsquared > 0.0) {
-      val t = -f - sqrt(dsquared)
-      if (t > ε) Some(t) else None
+    if (d2 > 0.0) {
+      val det = sqrt(d2)
+      val t = -f - det
+      if (t > ε)
+        Some((this, t))
+      else {
+        val t = -f + det
+        if (t > ε)
+          Some((this, t))
+        else
+          None
+      }
     }
     else
       None
@@ -69,11 +78,11 @@ case class Plane(
     v: Double
 ) extends Shape {
 
-  def intersect(ray: Ray): Option[Double] = {
+  def intersect(ray: Ray): Option[(Shape, Double)] = {
     if ((abs(ray.dir(side)) > Double.MinPositiveValue) && ((ray.r(side) > v) == posFacing)) {
       val t = (v - ray.r(side)) / ray.dir(side)
       if (t > ε)
-        Some(t)
+        Some((this, t))
       else
         None
     }

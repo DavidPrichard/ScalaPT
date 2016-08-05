@@ -1,7 +1,5 @@
 package scalapt
 
-import scala.math.{sqrt, pow}
-
 // miscellaneous functions and constants.
 object Util {
 
@@ -14,6 +12,7 @@ object Util {
     else
       x
   }
+
 
 
   def sqr(x: Double) = x * x

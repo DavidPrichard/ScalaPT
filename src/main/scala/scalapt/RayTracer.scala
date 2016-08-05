@@ -6,7 +6,9 @@ import scala.annotation.tailrec
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-object Concurrent {
+import math._
+
+object Parallel {
 
   implicit final val ExCtx = ExecutionContext.fromExecutor(null)
 
@@ -25,23 +27,12 @@ object Concurrent {
 }
 
 /**
-  * Pseudo-Monte-Carlo path tracing renderer.
-  *
-  * The RNG must produce uncorrelated, uniformly distributed numbers in [0,1]
+  * Pseudo-Monte-Carlo path-tracer.
   */
 class RayTracer(val width: Int, val height: Int, val scene: Scene) {
 
   private val cx = Vector3(width * scene.camera.fov / height, 0.0, 0.0)
-  private val cy = cx × scene.camera.dir * scene.camera.fov
-
-  println("camera dir = " + scene.camera.dir)
-  println("camera fov = " + scene.camera.fov)
-  println(s"cx = $cx")
-  println(s"cy = $cy")
-  println("camray for (0,0) =" + camRay(0,0))
-  println("camray for (1,1) =" + camRay(1,1))
-  println("camray for (128,128) =" + camRay(128,128))
-
+  private val cy = (cx × scene.camera.dir).normalize * scene.camera.fov
 
   // sample the radiance of light from a particular pixel at (x,y)
   def sample(x: Int, y: Int, rng: XorShift): RGB = {
@@ -49,15 +40,11 @@ class RayTracer(val width: Int, val height: Int, val scene: Scene) {
       val subx = x + rng.next0to1
       val suby = y + rng.next0to1
       val dir = scene.camera.dir + camRay(subx, suby)
-      //println(s"Ray direction component: $dir")
       radiance(new Ray(scene.camera.pos, dir), rng)
   }
 
   // tail-recursive version of ScalaPT's radiance function.
-  // russian roulette's max could be removed, now that there is no danger of blowing the stack
-  // russian roulette now takes into account the normalized previous color * current color,
-  // so it should terminate more aggressively now.
-  // Further advantages:
+  // russian roulette takes into account the normalized previous color * current color.
   // the output can be altered in interesting/valuable ways by passing different initial arguments
   // z.B. the attenuation, if it is set to RGB(1.0, 0.0, 0.0) will return on the red value detected in
   // the scene, but the russian roulette termination will also take this into account, as the
@@ -90,13 +77,4 @@ class RayTracer(val width: Int, val height: Int, val scene: Scene) {
   }
 
   def camRay(x: Double, y: Double): Vector3 = cx * (x/width - 0.5) + cy * (y/height - 0.5)
-
-
-  private def tent(x: Double): Double = {
-    if (x < 0.5)
-      Math.sqrt(x * 2.0) - 1.0
-    else
-      1.0 - Math.sqrt(2.0 - x * 2.0)
-  }
-
 }

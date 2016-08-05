@@ -12,7 +12,7 @@ import javax.imageio.ImageIO
 object MainFrame {
   def main(args: Array[String]): Unit = {
 
-    val inFile     = if (args.length > 0) args(0) else "scenes/horizon.json"
+    val inFile     = if (args.length > 0) args(0) else "scenes/cornell.json"
     val width      = if (args.length > 1) Integer.parseInt(args(1)) else 1024
     val height     = if (args.length > 2) Integer.parseInt(args(2)) else 768
     val iterations = if (args.length > 3) Integer.parseInt(args(3)) else 1024
@@ -35,12 +35,12 @@ class MainFrame(
   outFile.foreach(name => println("Outfile: " + name))
 
 
-  val scene = SceneIO.load(inFile)
-  val ins   = getInsets
-
+  val scene      = SceneIO.load(inFile)
+  val ins        = getInsets
   val rt         = new RayTracer(w, h, scene)
-  val renderData = initialRenderData(w, h)
   val image      = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB)
+  val renderData = initialRenderData(w, h)
+
 
   val gr2d = image.getGraphics
       gr2d.setColor(Color.RED)
@@ -55,7 +55,7 @@ class MainFrame(
   for (i <- 0 until iterations) {
     if (!closing) {
       render(i)
-      //repaint()
+      repaint()
       printStatus(i+1)
     }
   }
@@ -65,32 +65,32 @@ class MainFrame(
 
   def render(iteration: Int) = {
 
-    Concurrent.For(0 until h) { y =>
+    Parallel.For(0 until h) { y =>
       val row = new Array[RGB](w)
       for (x <- 0 until w) {
-        val seed = (x+y*w)*(iteration+1)
+        val seed = (x+y*w)*(iteration+1).toLong
         row(x) = rt.sample(x, y, new XorShift(seed))
       }
 
-      if (iteration == 0)
-        renderData(y) = row
-      else
-        merge(renderData(y), row, iteration)
-
-      val mergedRow = renderData(y)
+      merge(renderData(y), row, iteration)
 
       val sy = h - y - 1
 
-      for (sx <- 0 until w) image.setRGB(sx, sy, mergedRow(sx).clamp.outputColour)
-
-      repaint(ins.left, ins.top + sy, w, 1)
+      for (sx <- 0 until w) image.setRGB(sx, sy, renderData(y)(sx).clamp.outputColour)
     }
-  }
 
-  private def merge(l: Array[RGB], r: Array[RGB], n: Int): Unit = {
-    for (i <- l.indices)
-      l(i) = l(i).merge(r(i), n)
+//    Parallel.For(0 until h) { y =>
+//      for (x <- 0 until w) {
+//        val seed = (x+y*w)*(iteration+1)
+//        renderData(y)(x) = renderData(y)(x).merge(rt.sample(x, y, new XorShift(seed)), iteration)
+//        image.setRGB(x, h - y - 1, renderData(y)(x).clamp.outputColour)
+//      }
+//    }
 
+    def merge(l: Array[RGB], r: Array[RGB], n: Int): Unit = {
+      for (i <- l.indices)
+        l(i) = l(i).merge(r(i), n)
+    }
   }
 
   override def paint(graphics: Graphics) = {
@@ -147,15 +147,9 @@ class MainFrame(
   // the default "render data" for the ray-tracing to be merged into
   private def initialRenderData(width: Int, height: Int): Array[Array[RGB]] = {
 
-    val row = new Array[RGB](width).map(_ => RGB.Green)
+    def row = new Array[RGB](width).map(x => RGB.Green)
 
-    println(s"Height is $h and initialRenderData has $height rows.")
-    println(s"Width is $w and initialRenderData has $width pixels per row")
-
-    val init = new Array[Array[RGB]](height)
-      .map(_ => row)
-
-    init
+    new Array[Array[RGB]](height).map(y => row)
   }
 
 }

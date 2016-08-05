@@ -8,16 +8,6 @@ trait RNG[T] {
   def next: T
 }
 
-//class DoubleRNG(rng: RNG[Long]) extends RNG[Double] {
-//  import RNG._
-//
-//  def next: (DoubleRNG, Double) = {
-//    val (rng2, rl) = rng.next
-//    val dl = (rl.toDouble - Long.MinValue.toDouble) / Scale
-//    (new DoubleRNG(rng2), dl)
-//  }
-//}
-
 // XorShift64*, a relatively fast PRNG with better output than an LCG.
 // Look into xoroshiro128+ for an upgrade: http://xoroshiro.di.unimi.it/
 case class XorShift(var seed: Long) extends RNG[Long] {
