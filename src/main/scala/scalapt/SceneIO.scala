@@ -3,12 +3,13 @@ package scalapt
 import java.nio.file.{Files, Paths}
 import java.util.NoSuchElementException
 
-import cats.data.Xor
 import io.circe._
 import io.circe.Decoder
 import io.circe.generic.auto._
 import io.circe.parser._
 import io.circe.syntax._
+
+import cats.implicits._
 
 
 object SceneIO {
@@ -35,18 +36,18 @@ object SceneIO {
 object Codecs {
 
   final val typeString = "type"
-  
+
   def withType(json: Json, name: String): Json = json.mapObject(jo => jo.+:(typeString, name.asJson))
 
   implicit val decodeAxis: Decoder[Axis.Type] =
     Decoder.instance(c => c.focus.asString match {
         case Some(s) =>
-          try Xor.right(Axis.withName(s))
+          try Either.right(Axis.withName(s))
           catch {
-            case ex: NoSuchElementException => Xor.left(DecodingFailure(ex.getMessage, c.history))
+            case ex: NoSuchElementException => Either.left(DecodingFailure(ex.getMessage, c.history))
           }
         case None =>
-          Xor.left(DecodingFailure("String", c.history))
+          Either.left(DecodingFailure("String", c.history))
       }
     )
 
