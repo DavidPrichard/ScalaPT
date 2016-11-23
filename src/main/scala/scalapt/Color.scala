@@ -40,17 +40,24 @@ case class RGB(red: Double, green: Double, blue: Double) {
   // this calculates the running average, given that this rgb represents n samples/ is weighted by n
   def merge(that: RGB, n: Double) = (this * n + that) / (n + 1)
 
-  def toLinear: RGB = map(x => pow(x, 2.2))
+  //def toLinear: RGB = map(x => pow(x, 2.2))
 
-  def toGamma: RGB = map(Gamma)
+  // converts to gamma space, for display
+  def toGamma: RGB = map(x => pow(x, 1.0 / 2.2))
 
-  val Gamma = (x: Double) => pow(x, 1.0 / 2.2)
+  // converts to SRGB space
+  def toSRGB: RGB = map(x => {
+    if (x > 0.0031308)
+      1.055 * pow(x, 1.0/2.4) - 0.055
+    else
+      x * 12.92
+  })
 
   def outputColour: Int = {
-    val g = this.toGamma
+    val g = this.toSRGB
 
     // maps a 0.0-1.0 double color to 0-256 integer color
-    def to8bit = (d: Double) => (d * 255.0 + 0.5).toInt // Util.clamp(val, 0, 255)
+    def to8bit = (d: Double) => (d * 255.0 + 0.5).toInt // Util.clamp(val, 0, 256)
 
     to8bit(g.blue) | (to8bit(g.green) << 8) | (to8bit(g.red) << 16)
   }

@@ -1,175 +1,175 @@
 {
-  "camera" : {
-    "pos" : {
-      "x" : 0.0,
-      "y" : 150.0,
-      "z" : 400.0
+  "camera": {
+    "pos": {
+      "x": 0.0,
+      "y": 150.0,
+      "z": 400.0
     },
-    "dir" : {
-      "x" : 0.0,
-      "y" : -0.2982749931359468,
-      "z" : -0.9544799780350298
+    "dir": {
+      "x": 0.0,
+      "y": -0.3,
+      "z": -0.955
     },
-    "fov" : 0.65
+    "fov": 0.65
   },
-  "shapes" : [
+  "shapes": [
     {
-      "type" : "Plane",
-      "name" : "ground",
-      "mat" : {
-        "type" : "Diffuse",
-        "color" : {
-          "red" : 0.999,
-          "green" : 0.999,
-          "blue" : 0.999
+      "type": "Plane",
+      "name": "ground",
+      "mat": {
+        "type": "Diffuse",
+        "color": {
+          "red": 0.999,
+          "green": 0.999,
+          "blue": 0.999
         },
-        "emission" : {
-          "red" : 0.0,
-          "green" : 0.0,
-          "blue" : 0.0
+        "emission": {
+          "red": 0.0,
+          "green": 0.0,
+          "blue": 0.0
         }
       },
-      "side" : "Y",
-      "posFacing" : true,
-      "v" : 0.0
+      "side": "Y",
+      "posFacing": true,
+      "v": 0.0
     },
     {
-      "type" : "Sphere",
-      "name" : "refl",
-      "mat" : {
-        "type" : "Reflective",
-        "color" : {
-          "red" : 0.999,
-          "green" : 0.99,
-          "blue" : 0.98
+      "type": "Sphere",
+      "name": "refl",
+      "mat": {
+        "type": "Reflective",
+        "color": {
+          "red": 0.999,
+          "green": 0.999,
+          "blue": 0.999
         },
-        "emission" : {
-          "red" : 0.0,
-          "green" : 0.0,
-          "blue" : 0.0
+        "emission": {
+          "red": 0.0,
+          "green": 0.0,
+          "blue": 0.0
         }
       },
-      "center" : {
-        "x" : 0.0,
-        "y" : 66.66666666666667,
-        "z" : -66.66666666666667
+      "center": {
+        "x": 0.0,
+        "y": 66.667,
+        "z": -66.667
       },
-      "radius" : 90
+      "radius": 66.667
     },
     {
-      "type" : "Sphere",
-      "name" : "leftglass",
-      "mat" : {
-        "type" : "Refractive",
-        "color" : {
-          "red" : 0.5,
-          "green" : 0.0,
-          "blue" : 0.0
+      "type": "Sphere",
+      "name": "lglass",
+      "mat": {
+        "type": "Refractive",
+        "color": {
+          "red": 0.75,
+          "green": 0.25,
+          "blue": 0.25
         },
-        "emission" : {
-          "red" : 0.0,
-          "green" : 0.0,
-          "blue" : 0.0
+        "emission": {
+          "red": 0.0,
+          "green": 0.0,
+          "blue": 0.0
         }
       },
-      "center" : {
-        "x" : -66.66666666666667,
-        "y" : 25.0,
-        "z" : 100.0
+      "center": {
+        "x": -66.667,
+        "y": 25.0,
+        "z": 100.0
       },
-      "radius" : 25.0
+      "radius": 25.0
     },
     {
-      "type" : "Sphere",
-      "name" : "middleglass",
-      "mat" : {
-        "type" : "Refractive",
-        "color" : {
-          "red" : 0.25,
-          "green" : 0.75,
-          "blue" : 0.25
+      "type": "Sphere",
+      "name": "mglass",
+      "mat": {
+        "type": "Refractive",
+        "color": {
+          "red": 0.01,
+          "green": 0.01,
+          "blue": 0.01
         },
-        "emission" : {
-          "red" : 0.0,
-          "green" : 0.0,
-          "blue" : 0.0
+        "emission": {
+          "red": 0.0,
+          "green": 0.0,
+          "blue": 0.0
         }
       },
-      "center" : {
-        "x" : 0.0,
-        "y" : 25.0,
-        "z" : 150.0
+      "center": {
+        "x": 0.0,
+        "y": 25.0,
+        "z": 150.0
       },
-      "radius" : 25.0
+      "radius": 25.0
     },
     {
-      "type" : "Sphere",
-      "name" : "rightglass",
-      "mat" : {
-        "type" : "Refractive",
-        "color" : {
-          "red" : 0.5,
-          "green" : 0.1,
-          "blue" : 0.8
+      "type": "Sphere",
+      "name": "rglass",
+      "mat": {
+        "type": "Refractive",
+        "color": {
+          "red": 0.25,
+          "green": 0.25,
+          "blue": 0.75
         },
-        "emission" : {
-          "red" : 0.0,
-          "green" : 0.0,
-          "blue" : 0.0
+        "emission": {
+          "red": 0.0,
+          "green": 0.0,
+          "blue": 0.0
         }
       },
-      "center" : {
-        "x" : 66.66666666666667,
-        "y" : 40.0,
-        "z" : 100.0
+      "center": {
+        "x": 66.667,
+        "y": 25.0,
+        "z": 100.0
       },
-      "radius" : 35.0
+      "radius": 25.0
     },
     {
-      "type" : "Sphere",
-      "name" : "light",
-      "mat" : {
-        "type" : "Diffuse",
-        "color" : {
-          "red" : 0.0,
-          "green" : 0.0,
-          "blue" : 0.0
+      "type": "Sphere",
+      "name": "light",
+      "mat": {
+        "type": "Diffuse",
+        "color": {
+          "red": 0.0,
+          "green": 0.0,
+          "blue": 0.0
         },
-        "emission" : {
-          "red" : 14.0,
-          "green" : 14.0,
-          "blue" : 14.0
+        "emission": {
+          "red": 12.0,
+          "green": 12.0,
+          "blue": 12.0
         }
       },
-      "center" : {
-        "x" : 0.0,
-        "y" : 225.0,
-        "z" : 0.0
+      "center": {
+        "x": 0.0,
+        "y": 225.0,
+        "z": 0.0
       },
-      "radius" : 25.0
+      "radius": 25.0
     },
     {
-      "type" : "Sphere",
-      "name" : "sky",
-      "mat" : {
-        "type" : "Diffuse",
-        "color" : {
-          "red" : 0.52734375,
-          "green" : 0.8046875,
-          "blue" : 0.9765625
+      "type": "Sphere",
+      "name": "sky",
+      "mat": {
+        "type": "Diffuse",
+        "color": {
+          "red": 0.527,
+          "green": 0.80,
+          "blue": 0.976
         },
-        "emission" : {
-          "red" : 0.0,
-          "green" : 0.0,
-          "blue" : 0.0
+        "emission": {
+          "red": 0.0,
+          "green": 0.0,
+          "blue": 0.0
         }
       },
-      "center" : {
-        "x" : 0.0,
-        "y" : 1900.0,
-        "z" : 0.0
+      "center": {
+        "x": 0.0,
+        "y": 1900.0,
+        "z": 0.0
       },
-      "radius" : 1600.0
+      "radius": 1600.0
     }
   ]
 }

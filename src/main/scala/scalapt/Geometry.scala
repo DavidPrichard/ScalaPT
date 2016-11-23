@@ -99,6 +99,9 @@ case class Vector3(x: Double, y: Double, z: Double) {
 
   def lengthSquared: Double = x*x + y*y + z*z
 
+  // this is may be called enough in the code to be worth using the fast inverse sqr root
+  // https://stackoverflow.com/questions/11513344/how-to-implement-the-fast-inverse-square-root-in-java
+  // https://stackoverflow.com/questions/21010586/normalizing-spatial-vectors-without-square-root
   def normalize: Vector3 = this * (1.0 / length)
 
   def hasNaNs: Boolean = x.isNaN || y.isNaN || z.isNaN

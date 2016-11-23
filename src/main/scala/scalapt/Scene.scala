@@ -20,6 +20,6 @@ case class Scene(camera: Camera, shapes: Vector[Shape]) {
     shapes
       .flatMap(_.intersect(ray))
       .reduceOption(Scene.distance.min) // pick closest one
-      .map({ case (obj, t) => (obj, ray.travels(t)) })
+      .map{ case (obj, t) => (obj, ray.travels(t)) }
   }
 }

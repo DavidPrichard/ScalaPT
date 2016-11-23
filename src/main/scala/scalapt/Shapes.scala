@@ -42,15 +42,15 @@ case class Sphere(
   def intersect(ray: Ray): Option[(Shape, Double)] = {
     val e = ray.r - center
     val f = ray.dir ∙ e
-    val d2 = f*f - (e∙e) + radius*radius // = discriminant squared
+    val d2 = f*f - (e∙e) + radius*radius // discriminant squared
 
     if (d2 > 0.0) {
-      val det = sqrt(d2)
-      val t = -f - det
+      val d = sqrt(d2)
+      val t = -f - d
       if (t > ε)
         Some((this, t))
       else {
-        val t = -f + det
+        val t = -f + d
         if (t > ε)
           Some((this, t))
         else
